@@ -1,0 +1,32 @@
+name: Submissions
+# velo-client.com/library/servers pushes a branch submit/<id>-<time> (ownership already checked through the server's
+# MOTD); this validates it and opens the pull request.
+on:
+  push:
+    branches: ["submit/**"]
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pillow jsonschema
+      - run: python scripts/validate.py
+      - name: Open the pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          title=$(git log -1 --format=%s)
+          git log -1 --format=%b > body.md
+          if gh pr list --head "$GITHUB_REF_NAME" --json number --jq '.[0].number' | grep -q .; then
+            echo "pull request already open"
+          else
+            gh pr create --base main --head "$GITHUB_REF_NAME" --title "$title" --body-file body.md
+          fi
