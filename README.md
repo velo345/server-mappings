@@ -6,14 +6,19 @@ server gets a proper card on [velo-client.com/library/server](https://velo-clien
 
 ## Add your server
 
+**The easy way:** [velo-client.com/library/servers](https://velo-client.com/library/servers) - enter your address, put
+the code it gives you into your MOTD for a moment (that proves you run the server), fill in the details, upload your
+logo and banner. It opens the pull request here for you.
+
+**By hand:**
+
 1. Fork this repo.
 2. Create `servers/<id>/` (lower case, letters, digits and `-`), with:
    - `metadata.json` - see the example below and [`schema.json`](schema.json) for every field.
-   - `logo.png` - optional, **square**, 128-1024 px (512 recommended), under 512 KB. Without one, Velo uses your
-     server icon.
-   - `background.png` - optional, a wide picture of your server, under 2 MB.
-3. Open a pull request. The check tells you if anything is off; we merge mapped servers usually within a day.
-   Only add servers you own or run.
+   - `logo.png` - **required**, square, 128-1024 px (512 recommended), under 512 KB. It's the big picture in
+     players' Discord status.
+   - `banner.png` - **required**, wide (16:9 to 5:1, e.g. 1920x1080 or 1600x480), under 2 MB. Your server card.
+3. Open a pull request. The check tells you if anything is off. Only add servers you own or run.
 
 ```json
 {
@@ -44,7 +49,7 @@ Everything is served by the Velo Library API (free, no key needed for light use)
 
 - `GET https://velo-client.com/v2/servers` - every mapped server
 - `GET https://velo-client.com/v2/servers/lookup?address=play.example.net` - the mapping for an address
-- `GET https://velo-client.com/v2/servers/<id>/logo.png`
+- `GET https://velo-client.com/v2/servers/<id>/logo.png` and `/banner.png`
 
 Servers running the [Velo Bridge plugin](https://dev.velo-client.com) can also set the Discord status live.
 

@@ -37,9 +37,10 @@ for folder in sorted((root / "servers").iterdir()):
         owners[a] = folder.name
     if meta.get("primaryAddress") and not any(fnmatch.fnmatch(meta["primaryAddress"], p) or meta["primaryAddress"] == p for p in meta.get("addresses", [])):
         problems.append(f"{folder.name}: primaryAddress must match one of the addresses")
-    for img, (lo, hi), limit in (("logo.png", (128, 1024), 512 * 1024), ("background.png", (640, 2560), 2 * 1024 * 1024)):
+    for img, (lo, hi), limit in (("logo.png", (128, 1024), 512 * 1024), ("banner.png", (640, 2560), 2 * 1024 * 1024)):
         p = folder / img
         if not p.exists():
+            problems.append(f"{folder.name}: {img} is missing (logo and banner are both required)")
             continue
         if p.stat().st_size > limit:
             problems.append(f"{folder.name}: {img} is larger than {limit // 1024} KB")
@@ -49,7 +50,9 @@ for folder in sorted((root / "servers").iterdir()):
                     problems.append(f"{folder.name}: {img} must be a PNG")
                 if img == "logo.png" and (im.width != im.height or not lo <= im.width <= hi):
                     problems.append(f"{folder.name}: logo.png must be square, {lo}-{hi} px")
-    extra = {p.name for p in folder.iterdir()} - {"metadata.json", "logo.png", "background.png"}
+                if img == "banner.png" and (not 1.7 <= im.width / im.height <= 5 or not lo <= im.width <= hi):
+                    problems.append(f"{folder.name}: banner.png must be wide (16:9 to 5:1), {lo}-{hi} px across")
+    extra = {p.name for p in folder.iterdir()} - {"metadata.json", "logo.png", "banner.png"}
     if extra:
         problems.append(f"{folder.name}: unexpected files {sorted(extra)}")
 
